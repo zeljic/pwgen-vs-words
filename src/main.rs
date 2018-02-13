@@ -8,7 +8,6 @@ use std::path::Path;
 
 use clap::{App, Arg};
 
-#[inline]
 fn read_dictionary(dictionary: &str, length: usize) -> Vec<String> {
     match OpenOptions::new().read(true).open(Path::new(dictionary)) {
         Ok(source) => BufReader::new(source)
@@ -33,7 +32,6 @@ fn read_dictionary(dictionary: &str, length: usize) -> Vec<String> {
     }
 }
 
-#[inline]
 fn exec_pwgen(length: usize, size: usize) -> Vec<String> {
     match Command::new("pwgen")
         .args(&["-A", "-0", &length.to_string(), &size.to_string()])
@@ -93,6 +91,6 @@ fn main() {
 
     exec_pwgen(characters, generate)
         .into_iter()
-        .filter(|ref generated_item| words.contains(generated_item))
+        .filter(|generated_item| words.contains(generated_item))
         .for_each(|ref found_item| println!("{}", found_item));
 }
