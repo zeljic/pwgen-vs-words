@@ -10,7 +10,9 @@ use clap::{App, Arg};
 
 mod error;
 
-fn read_dictionary(dictionary: &str, length: usize) -> error::Result<Vec<String>> {
+type Result<T> = std::result::Result<T, error::GeneralError>;
+
+fn read_dictionary(dictionary: &str, length: usize) -> Result<Vec<String>> {
     match OpenOptions::new().read(true).open(Path::new(dictionary)) {
         Ok(source) => Ok(BufReader::new(source)
             .lines()
@@ -32,7 +34,7 @@ fn read_dictionary(dictionary: &str, length: usize) -> error::Result<Vec<String>
     }
 }
 
-fn exec_pwgen(length: usize, size: usize) -> error::Result<Vec<String>> {
+fn exec_pwgen(length: usize, size: usize) -> Result<Vec<String>> {
     match Command::new("pwgen")
         .args(&["-A", "-0", &length.to_string(), &size.to_string()])
         .output()

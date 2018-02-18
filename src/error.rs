@@ -1,7 +1,5 @@
 use std;
 
-pub type Result<T> = std::result::Result<T, GeneralError>;
-
 #[derive(Debug, Clone)]
 pub enum GeneralErrorKind {
     PWGEN,
