@@ -8,6 +8,8 @@ use std::path::Path;
 
 use clap::{App, Arg};
 
+type Result<T> = std::result::Result<T, GeneralError>;
+
 #[derive(Debug, Clone)]
 enum GeneralErrorKind {
     PWGEN,
@@ -45,10 +47,7 @@ impl std::fmt::Display for GeneralError {
     }
 }
 
-fn read_dictionary(
-    dictionary: &str,
-    length: usize,
-) -> std::result::Result<Vec<String>, GeneralError> {
+fn read_dictionary(dictionary: &str, length: usize) -> Result<Vec<String>> {
     match OpenOptions::new().read(true).open(Path::new(dictionary)) {
         Ok(source) => Ok(BufReader::new(source)
             .lines()
@@ -70,7 +69,7 @@ fn read_dictionary(
     }
 }
 
-fn exec_pwgen(length: usize, size: usize) -> std::result::Result<Vec<String>, GeneralError> {
+fn exec_pwgen(length: usize, size: usize) -> Result<Vec<String>> {
     match Command::new("pwgen")
         .args(&["-A", "-0", &length.to_string(), &size.to_string()])
         .output()
