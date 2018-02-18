@@ -41,7 +41,6 @@ fn exec_pwgen(length: usize, size: usize) -> Result<Vec<String>> {
     {
         Ok(result) => Ok(String::from_utf8_lossy(&result.stdout)
             .split_whitespace()
-            .into_iter()
             .map(String::from)
             .collect::<Vec<String>>()),
 
