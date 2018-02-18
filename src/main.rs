@@ -8,46 +8,9 @@ use std::path::Path;
 
 use clap::{App, Arg};
 
-type Result<T> = std::result::Result<T, GeneralError>;
+mod error;
 
-#[derive(Debug, Clone)]
-enum GeneralErrorKind {
-    PWGEN,
-    WORDS,
-}
-
-impl std::fmt::Display for GeneralErrorKind {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match *self {
-                GeneralErrorKind::PWGEN => "PWGEN",
-                GeneralErrorKind::WORDS => "WORDS",
-            }
-        )
-    }
-}
-
-#[derive(Debug, Clone)]
-struct GeneralError {
-    kind: GeneralErrorKind,
-    message: String,
-}
-
-impl std::error::Error for GeneralError {
-    fn description(&self) -> &str {
-        &self.message
-    }
-}
-
-impl std::fmt::Display for GeneralError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "[{}] Error: {}", self.kind, self.message)
-    }
-}
-
-fn read_dictionary(dictionary: &str, length: usize) -> Result<Vec<String>> {
+fn read_dictionary(dictionary: &str, length: usize) -> error::Result<Vec<String>> {
     match OpenOptions::new().read(true).open(Path::new(dictionary)) {
         Ok(source) => Ok(BufReader::new(source)
             .lines()
@@ -62,14 +25,14 @@ fn read_dictionary(dictionary: &str, length: usize) -> Result<Vec<String>> {
                 _ => None,
             })
             .collect::<Vec<String>>()),
-        Err(..) => Err(GeneralError {
+        Err(..) => Err(error::GeneralError {
             message: "Unable to read dictionary".to_string(),
-            kind: GeneralErrorKind::WORDS,
+            kind: error::GeneralErrorKind::WORDS,
         }),
     }
 }
 
-fn exec_pwgen(length: usize, size: usize) -> Result<Vec<String>> {
+fn exec_pwgen(length: usize, size: usize) -> error::Result<Vec<String>> {
     match Command::new("pwgen")
         .args(&["-A", "-0", &length.to_string(), &size.to_string()])
         .output()
@@ -80,9 +43,9 @@ fn exec_pwgen(length: usize, size: usize) -> Result<Vec<String>> {
             .map(String::from)
             .collect::<Vec<String>>()),
 
-        Err(..) => Err(GeneralError {
+        Err(..) => Err(error::GeneralError {
             message: "Unable to generate pwgen data".to_string(),
-            kind: GeneralErrorKind::PWGEN,
+            kind: error::GeneralErrorKind::PWGEN,
         }),
     }
 }
