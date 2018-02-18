@@ -8,9 +8,49 @@ use std::path::Path;
 
 use clap::{App, Arg};
 
-fn read_dictionary(dictionary: &str, length: usize) -> Vec<String> {
+#[derive(Debug, Clone)]
+enum GeneralErrorKind {
+    PWGEN,
+    WORDS,
+}
+
+impl std::fmt::Display for GeneralErrorKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(
+            f,
+            "{}",
+            match *self {
+                GeneralErrorKind::PWGEN => "PWGEN",
+                GeneralErrorKind::WORDS => "WORDS",
+            }
+        )
+    }
+}
+
+#[derive(Debug, Clone)]
+struct GeneralError {
+    kind: GeneralErrorKind,
+    message: String,
+}
+
+impl std::error::Error for GeneralError {
+    fn description(&self) -> &str {
+        &self.message
+    }
+}
+
+impl std::fmt::Display for GeneralError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "[{}] Error: {}", self.kind, self.message)
+    }
+}
+
+fn read_dictionary(
+    dictionary: &str,
+    length: usize,
+) -> std::result::Result<Vec<String>, GeneralError> {
     match OpenOptions::new().read(true).open(Path::new(dictionary)) {
-        Ok(source) => BufReader::new(source)
+        Ok(source) => Ok(BufReader::new(source)
             .lines()
             .filter_map(|wr| match wr {
                 Ok(ref wr_result) => {
@@ -22,33 +62,29 @@ fn read_dictionary(dictionary: &str, length: usize) -> Vec<String> {
                 }
                 _ => None,
             })
-            .collect::<Vec<String>>(),
-        Err(e) => {
-            println!("Unable to open dictionary file.");
-            eprintln!("ERROR: {}", e);
-
-            vec![]
-        }
+            .collect::<Vec<String>>()),
+        Err(..) => Err(GeneralError {
+            message: "Unable to read dictionary".to_string(),
+            kind: GeneralErrorKind::WORDS,
+        }),
     }
 }
 
-fn exec_pwgen(length: usize, size: usize) -> Vec<String> {
+fn exec_pwgen(length: usize, size: usize) -> std::result::Result<Vec<String>, GeneralError> {
     match Command::new("pwgen")
         .args(&["-A", "-0", &length.to_string(), &size.to_string()])
         .output()
     {
-        Ok(result) => String::from_utf8_lossy(&result.stdout)
+        Ok(result) => Ok(String::from_utf8_lossy(&result.stdout)
             .split_whitespace()
             .into_iter()
             .map(String::from)
-            .collect::<Vec<String>>(),
+            .collect::<Vec<String>>()),
 
-        Err(e) => {
-            println!("Unable to generate pwgen data");
-            eprintln!("ERROR: {}", e);
-
-            vec![]
-        }
+        Err(..) => Err(GeneralError {
+            message: "Unable to generate pwgen data".to_string(),
+            kind: GeneralErrorKind::PWGEN,
+        }),
     }
 }
 
@@ -87,10 +123,20 @@ fn main() {
     let generate: usize = value_t_or_exit!(args.value_of("generate"), usize);
     let words_path: &str = args.value_of("words").unwrap();
 
-    let words = read_dictionary(words_path, characters);
-
-    exec_pwgen(characters, generate)
-        .into_iter()
-        .filter(|generated_item| words.contains(generated_item))
-        .for_each(|ref found_item| println!("{}", found_item));
+    match read_dictionary(words_path, characters) {
+        Ok(words) => match exec_pwgen(characters, generate) {
+            Ok(generated_list) => {
+                generated_list
+                    .iter()
+                    .filter(|generated_item| words.contains(generated_item))
+                    .for_each(|found_item| println!("{}", found_item));
+            }
+            Err(e) => {
+                println!("{}", e);
+            }
+        },
+        Err(e) => {
+            println!("{}", e);
+        }
+    };
 }
