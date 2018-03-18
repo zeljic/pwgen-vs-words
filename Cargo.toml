@@ -5,4 +5,4 @@ version = "0.0.1"
 authors = ["Đorđe Zeljić <zeljic@gmail.com>"]
 
 [dependencies]
-clap = "2.30.0"
+clap = "2.31.1"
