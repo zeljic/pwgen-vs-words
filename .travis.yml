@@ -5,7 +5,7 @@ os:
 rust:
   - nightly
 script:
-  - cargo build --verbose --all --release
+  - cargo build --release --verbose --all
 matrix:
   fast_finish: true
 cache: cargo
