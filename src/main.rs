@@ -77,9 +77,7 @@ fn main() {
         .version(crate_version!())
         .author(crate_authors!())
         .about(crate_description!())
-        .arg(&arg_characters)
-        .arg(&arg_words)
-        .arg(&arg_gen)
+        .args(&[arg_characters, arg_words, arg_gen])
         .get_matches();
 
     let characters: usize = value_t_or_exit!(args.value_of("characters"), usize);
