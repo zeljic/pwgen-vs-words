@@ -109,27 +109,16 @@ fn main() {
     let pipe: bool = args.is_present("pipe");
 
     match read_dictionary(words_path, chars) {
-        Ok(words) => {
-            if pipe {
-                match read_pipe(chars) {
-                    Ok(list) => {
-                        operate(&list, &words);
-                    }
-                    Err(e) => {
-                        println!("{}", e);
-                    }
-                }
-            } else {
-                match exec_pwgen(chars, generate) {
-                    Ok(list) => {
-                        operate(&list, &words);
-                    }
-                    Err(e) => {
-                        println!("{}", e);
-                    }
-                }
+        Ok(words) => match if pipe {
+            read_pipe(chars)
+        } else {
+            exec_pwgen(chars, generate)
+        } {
+            Ok(list) => operate(&list, &words),
+            Err(e) => {
+                println!("{}", e);
             }
-        }
+        },
         Err(e) => {
             println!("{}", e);
         }
