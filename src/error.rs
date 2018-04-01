@@ -1,37 +1,39 @@
 use std;
 
 #[derive(Debug, Clone)]
-pub enum GeneralErrorKind {
+pub enum GenericErrorKind {
     PWGEN,
     WORDS,
+    PIPEREAD,
 }
 
-impl std::fmt::Display for GeneralErrorKind {
+impl std::fmt::Display for GenericErrorKind {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(
             f,
             "{}",
             match *self {
-                GeneralErrorKind::PWGEN => "PWGEN",
-                GeneralErrorKind::WORDS => "WORDS",
+                GenericErrorKind::PWGEN => "PWGEN",
+                GenericErrorKind::WORDS => "WORDS",
+                GenericErrorKind::PIPEREAD => "PIPEREAD",
             }
         )
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct GeneralError {
-    pub kind: GeneralErrorKind,
+pub struct GenericError {
+    pub kind: GenericErrorKind,
     pub message: String,
 }
 
-impl std::error::Error for GeneralError {
+impl std::error::Error for GenericError {
     fn description(&self) -> &str {
         &self.message
     }
 }
 
-impl std::fmt::Display for GeneralError {
+impl std::fmt::Display for GenericError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "[{}] Error: {}", self.kind, self.message)
     }
