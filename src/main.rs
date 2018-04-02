@@ -65,12 +65,6 @@ fn read_pipe(chars: usize) -> Result<Vec<String>> {
     }
 }
 
-fn operate(list: &[String], words: &[String]) {
-    list.iter()
-        .filter(|item| words.contains(item))
-        .for_each(|item| println!("{}", item));
-}
-
 fn main() {
     let arg_chars: Arg = Arg::with_name("chars")
         .short("c")
@@ -114,7 +108,11 @@ fn main() {
         } else {
             exec_pwgen(chars, generate)
         } {
-            Ok(list) => operate(&list, &words),
+            Ok(list) => {
+                list.iter()
+                    .filter(|item| words.contains(item))
+                    .for_each(|item| println!("{}", item));
+            }
             Err(e) => {
                 println!("{}", e);
             }
