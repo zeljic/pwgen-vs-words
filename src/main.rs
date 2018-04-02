@@ -78,27 +78,27 @@ fn main() {
         .takes_value(true)
         .required(true);
 
-    let arg_gen: Arg = Arg::with_name("generate")
+    let arg_count: Arg = Arg::with_name("count")
         .short("g")
-        .long("generate")
+        .long("count")
         .conflicts_with("pipe")
         .takes_value(true);
 
     let arg_pipe: Arg = Arg::with_name("pipe")
         .short("p")
         .long("pipe")
-        .conflicts_with("generate")
+        .conflicts_with("count")
         .takes_value(false);
 
     let args = App::new(crate_name!())
         .version(crate_version!())
         .author(crate_authors!())
         .about(crate_description!())
-        .args(&[arg_chars, arg_words, arg_gen, arg_pipe])
+        .args(&[arg_chars, arg_words, arg_count, arg_pipe])
         .get_matches();
 
     let chars: usize = value_t_or_exit!(args.value_of("chars"), usize);
-    let generate: usize = value_t!(args.value_of("generate"), usize).unwrap_or_else(|_e| 0);
+    let count: usize = value_t!(args.value_of("count"), usize).unwrap_or_else(|_e| 0);
     let words_path: &str = args.value_of("words").unwrap();
     let pipe: bool = args.is_present("pipe");
 
@@ -106,7 +106,7 @@ fn main() {
         Ok(words) => match if pipe {
             read_pipe(chars)
         } else {
-            exec_pwgen(chars, generate)
+            exec_pwgen(chars, count)
         } {
             Ok(list) => {
                 list.iter()
