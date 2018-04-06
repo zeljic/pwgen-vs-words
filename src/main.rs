@@ -99,10 +99,10 @@ fn main() {
 
     let chars: usize = value_t_or_exit!(args.value_of("chars"), usize);
     let count: usize = value_t!(args.value_of("count"), usize).unwrap_or_else(|_e| 0);
-    let words_path: &str = args.value_of("words").unwrap();
+    let words: String = value_t_or_exit!(args.value_of("words"), String);
     let pipe: bool = args.is_present("pipe");
 
-    match read_dictionary(words_path, chars) {
+    match read_dictionary(&words, chars) {
         Ok(words) => match if pipe {
             read_pipe(chars)
         } else {
