@@ -69,9 +69,9 @@ fn read_pipe(chars: usize) -> Result<Vec<String>> {
 }
 
 fn main() {
-    let arg_chars: Arg = Arg::with_name("chars")
-        .short("c")
-        .long("chars")
+    let arg_letters: Arg = Arg::with_name("letters")
+        .short("l")
+        .long("letters")
         .takes_value(true)
         .required(true);
 
@@ -82,7 +82,7 @@ fn main() {
         .required(true);
 
     let arg_count: Arg = Arg::with_name("count")
-        .short("g")
+        .short("c")
         .long("count")
         .conflicts_with("pipe")
         .takes_value(true);
@@ -97,10 +97,10 @@ fn main() {
         .version(crate_version!())
         .author(crate_authors!())
         .about(crate_description!())
-        .args(&[arg_chars, arg_words, arg_count, arg_pipe])
+        .args(&[arg_letters, arg_words, arg_count, arg_pipe])
         .get_matches();
 
-    let chars: usize = value_t_or_exit!(args.value_of("chars"), usize);
+    let chars: usize = value_t_or_exit!(args.value_of("letters"), usize);
     let count: usize = value_t!(args.value_of("count"), usize).unwrap_or_else(|_e| 0);
     let words: String = value_t_or_exit!(args.value_of("words"), String);
     let pipe: bool = args.is_present("pipe");

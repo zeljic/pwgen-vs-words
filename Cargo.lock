@@ -128,7 +128,7 @@ dependencies = [
 
 [[package]]
 name = "pwgen-vs-words"
-version = "0.0.2"
+version = "0.0.3"
 dependencies = [
  "clap 2.31.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "rayon 1.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
