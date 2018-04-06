@@ -1,9 +1,12 @@
 #[macro_use]
 extern crate clap;
+extern crate rayon;
 
 use std::{fs::OpenOptions, io::{self, BufRead, BufReader, Read}, path::Path, process::Command};
 
 use clap::{App, Arg};
+
+use rayon::prelude::*;
 
 mod error;
 
@@ -109,7 +112,7 @@ fn main() {
             exec_pwgen(chars, count)
         } {
             Ok(list) => {
-                list.iter()
+                list.par_iter()
                     .filter(|item| words.contains(item))
                     .for_each(|item| println!("{}", item));
             }

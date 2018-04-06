@@ -6,3 +6,4 @@ authors = ["Đorđe Zeljić <zeljic@gmail.com>"]
 
 [dependencies]
 clap = "2.31.2"
+rayon = "1.0.1"
