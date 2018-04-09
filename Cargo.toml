@@ -1,7 +1,7 @@
 [package]
 name = "pwgen-vs-words"
 description = "Generate passwords with pgwen and check if generated passwords are in english dictionary"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["Đorđe Zeljić <zeljic@gmail.com>"]
 
 [dependencies]

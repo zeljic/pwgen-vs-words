@@ -3,7 +3,7 @@ use std;
 #[derive(Debug, Clone)]
 pub enum GenericErrorKind {
     PWGEN,
-    WORDS,
+    DICTIONARY,
     PIPEREAD,
 }
 
@@ -14,7 +14,7 @@ impl std::fmt::Display for GenericErrorKind {
             "{}",
             match *self {
                 GenericErrorKind::PWGEN => "PWGEN",
-                GenericErrorKind::WORDS => "WORDS",
+                GenericErrorKind::DICTIONARY => "WORDS",
                 GenericErrorKind::PIPEREAD => "PIPEREAD",
             }
         )

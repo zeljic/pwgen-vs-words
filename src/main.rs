@@ -2,11 +2,9 @@
 extern crate clap;
 extern crate rayon;
 
-use std::{fs::OpenOptions, io::{self, BufRead, BufReader, Read}, path::Path, process::Command};
-
 use clap::{App, Arg};
-
 use rayon::prelude::*;
+use std::{fs::OpenOptions, io::{self, BufRead, BufReader, Read}, path::Path, process::Command};
 
 mod error;
 
@@ -29,7 +27,7 @@ fn read_dictionary(dictionary: &str, length: usize) -> Result<Vec<String>> {
             .collect::<Vec<String>>()),
         Err(..) => Err(error::GenericError {
             message: "Unable to read dictionary".to_string(),
-            kind: error::GenericErrorKind::WORDS,
+            kind: error::GenericErrorKind::DICTIONARY,
         }),
     }
 }
@@ -40,7 +38,7 @@ fn exec_pwgen(length: usize, size: usize) -> Result<Vec<String>> {
         .output()
     {
         Ok(result) => Ok(String::from_utf8_lossy(&result.stdout)
-            .split_whitespace()
+            .par_split_whitespace()
             .map(String::from)
             .collect::<Vec<String>>()),
 
@@ -57,7 +55,7 @@ fn read_pipe(chars: usize) -> Result<Vec<String>> {
     let mut handle = stdin.lock();
 
     match handle.read_to_string(&mut buf) {
-        Ok(..) => Ok(buf.split_whitespace()
+        Ok(..) => Ok(buf.par_split_whitespace()
             .filter(|item| item.len() == chars)
             .map(String::from)
             .collect::<Vec<String>>()),
@@ -75,9 +73,9 @@ fn main() {
         .takes_value(true)
         .required(true);
 
-    let arg_words: Arg = Arg::with_name("words")
-        .short("w")
-        .long("words")
+    let arg_dictionary: Arg = Arg::with_name("dictionary")
+        .short("d")
+        .long("dictionary")
         .takes_value(true)
         .required(true);
 
@@ -97,19 +95,19 @@ fn main() {
         .version(crate_version!())
         .author(crate_authors!())
         .about(crate_description!())
-        .args(&[arg_letters, arg_words, arg_count, arg_pipe])
+        .args(&[arg_letters, arg_dictionary, arg_count, arg_pipe])
         .get_matches();
 
-    let chars: usize = value_t_or_exit!(args.value_of("letters"), usize);
+    let letters: usize = value_t_or_exit!(args.value_of("letters"), usize);
     let count: usize = value_t!(args.value_of("count"), usize).unwrap_or_else(|_e| 0);
-    let words: String = value_t_or_exit!(args.value_of("words"), String);
+    let words: String = value_t_or_exit!(args.value_of("dictionary"), String);
     let pipe: bool = args.is_present("pipe");
 
-    match read_dictionary(&words, chars) {
+    match read_dictionary(&words, letters) {
         Ok(words) => match if pipe {
-            read_pipe(chars)
+            read_pipe(letters)
         } else {
-            exec_pwgen(chars, count)
+            exec_pwgen(letters, count)
         } {
             Ok(list) => {
                 list.par_iter()
