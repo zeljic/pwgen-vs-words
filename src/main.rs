@@ -117,7 +117,7 @@ fn main() {
         } {
             Ok(list) => {
                 list.par_iter()
-                    .filter(|item| words.contains(item))
+                    .filter(|item| words.binary_search(item).is_ok())
                     .for_each(|item| println!("{}", item));
             }
             Err(e) => {
