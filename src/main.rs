@@ -12,19 +12,25 @@ type Result<T> = std::result::Result<T, error::GenericError>;
 
 fn read_dictionary(dictionary: &str, length: usize) -> Result<Vec<String>> {
     match OpenOptions::new().read(true).open(Path::new(dictionary)) {
-        Ok(source) => Ok(BufReader::new(source)
-            .lines()
-            .filter_map(|wr| match wr {
-                Ok(ref wr_result) => {
-                    if wr_result.len() == length {
-                        Some(wr_result.to_lowercase())
-                    } else {
-                        None
+        Ok(source) => {
+            let mut list = BufReader::new(source)
+                .lines()
+                .filter_map(|wr| match wr {
+                    Ok(ref wr_result) => {
+                        if wr_result.len() == length {
+                            Some(wr_result.to_lowercase())
+                        } else {
+                            None
+                        }
                     }
-                }
-                _ => None,
-            })
-            .collect::<Vec<String>>()),
+                    _ => None,
+                })
+                .collect::<Vec<String>>();
+
+            list.sort();
+
+            Ok(list)
+        }
         Err(..) => Err(error::GenericError {
             message: "Unable to read dictionary".to_string(),
             kind: error::GenericErrorKind::DICTIONARY,
