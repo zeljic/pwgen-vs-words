@@ -1,0 +1,6 @@
+test
+pass
+word
+hello
+world
+foobar
